@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +21,8 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderDes
         private Mock<IMediator> _mediatorMock;
         private ProviderDescriptionUpdateController _sut;
         private Mock<IUrlHelper> _urlHelperMock;
-        string verifyUrl = "http://test";
+        private Mock<IValidator<ProviderDescriptionSubmitModel>> _validatorMock;
+        readonly string verifyUrl = "http://test";
         public const int Ukprn = 12345678;
         public const string LegalName = "TestLegalName";
         public const string ExistingProviderDescription = "TestProviderDescription-existing";
@@ -32,6 +35,8 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderDes
 
             _urlHelperMock = new Mock<IUrlHelper>();
 
+            _validatorMock = new Mock<IValidator<ProviderDescriptionSubmitModel>>();
+
             _urlHelperMock
                .Setup(m => m.RouteUrl(It.Is<UrlRouteContext>(c => c.RouteName.Equals(RouteNames.GetProviderDescription))))
                .Returns(verifyUrl);
@@ -40,7 +45,10 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderDes
                .Setup(m => m.RouteUrl(It.Is<UrlRouteContext>(c => c.RouteName.Equals(RouteNames.GetProviderDetails))))
                .Returns(verifyUrl);
 
-            _sut = new ProviderDescriptionUpdateController(_mediatorMock.Object, Mock.Of<ILogger<ProviderDescriptionUpdateController>>());
+            _validatorMock.Setup(x => x.Validate(It.IsAny<ProviderDescriptionSubmitModel>()))
+                .Returns(new ValidationResult());
+
+            _sut = new ProviderDescriptionUpdateController(_mediatorMock.Object, Mock.Of<ILogger<ProviderDescriptionUpdateController>>(), _validatorMock.Object);
             _sut.Url = _urlHelperMock.Object;
         }
 
@@ -70,7 +78,13 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderDes
         [Test]
         public void ProviderDescriptionUpdateController_UpdateProviderDescription_ModelStateErrorReturnSameView()
         {
-            _sut.ModelState.AddModelError("ProviderDescription", "ErrorMessageEmptyString");
+            var failedValidationResult = new ValidationResult
+            {
+                Errors = [new ValidationFailure("ProviderDescription", "ErrorMessageEmptyString")]
+            };
+
+            _validatorMock.Setup(x => x.Validate(It.IsAny<ProviderDescriptionSubmitModel>()))
+                .Returns(failedValidationResult);
 
             var submitModel = new ProviderDescriptionSubmitModel
             {

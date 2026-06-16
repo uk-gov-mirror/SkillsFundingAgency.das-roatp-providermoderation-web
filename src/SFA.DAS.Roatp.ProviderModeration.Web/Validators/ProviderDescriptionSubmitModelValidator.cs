@@ -14,7 +14,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Validators
         {
             RuleFor(x => x.ProviderDescription)
                 .NotEmpty().WithMessage(ProviderDescriptionEmptyMessage)
-                .Must(description => !string.IsNullOrEmpty(description) && description.Replace("\r","").Replace("\n","").Length<= ProviderDescriptionMaximumLength).WithMessage(ProviderDescriptionLengthErrorMessage)
+                .Must(description => !string.IsNullOrEmpty(description) && description.Replace("\r", "").Replace("\n", "").Length <= ProviderDescriptionMaximumLength).WithMessage(ProviderDescriptionLengthErrorMessage)
                 .Matches(ValidCharactersExpression).WithMessage(ProviderDescriptionHasInvalidCharacter);
         }
     }

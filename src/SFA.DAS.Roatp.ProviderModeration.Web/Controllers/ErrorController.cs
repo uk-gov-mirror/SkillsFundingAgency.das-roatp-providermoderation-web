@@ -45,11 +45,11 @@ public class ErrorController : Controller
 
         if (User.Identity!.IsAuthenticated)
         {
-            _logger.LogError(feature!.Error, "Unexpected error occured during request to path: {path} by user: {user}", feature.Path, HttpContext.User.FindFirstValue(ClaimTypes.Upn));
+            _logger.LogError(feature!.Error, "Unexpected error occured during request to path: {Path} by user: {User}", feature.Path, HttpContext.User.FindFirstValue(ClaimTypes.Upn));
         }
         else
         {
-            _logger.LogError(feature!.Error, "Unexpected error occured during request to {path}", feature.Path);
+            _logger.LogError(feature!.Error, "Unexpected error occured during request to {Path}", feature.Path);
         }
         return View(errorViewModel);
     }

@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using SFA.DAS.Roatp.ProviderModeration.Domain.Interfaces;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using SFA.DAS.Roatp.ProviderModeration.Domain.Interfaces;
 
 namespace SFA.DAS.Roatp.ProviderModeration.Infrastructure.ApiClients
 {
@@ -43,7 +43,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Infrastructure.ApiClients
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "Error when processing request: {httpMethod} - {uri}", HttpMethod.Get, uri);
+                _logger.LogError(ex, "Error when processing request: {HttpMethod} - {Uri}", HttpMethod.Get, uri);
                 throw;
             }
         }
@@ -69,7 +69,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Infrastructure.ApiClients
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "Error when processing request: {httpMethod} - {uri}", HttpMethod.Post, uri);
+                _logger.LogError(ex, "Error when processing request: {HttpMethod} - {Uri}", HttpMethod.Post, uri);
                 throw;
             }
         }
@@ -89,7 +89,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Infrastructure.ApiClients
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var apiErrorMessage = responseContent;
 
-                _logger.LogError("Method: {callingMethod} || HTTP {statusCode} {reasonPhrase} || {httpMethod}: {requestUri} || Message: {apiErrorMessage}", callingMethod, statusCode, reasonPhrase, httpMethod, requestUri, apiErrorMessage);
+                _logger.LogError("Method: {CallingMethod} || HTTP {StatusCode} {ReasonPhrase} || {HttpMethod}: {RequestUri} || Message: {ApiErrorMessage}", callingMethod, statusCode, reasonPhrase, httpMethod, requestUri, apiErrorMessage);
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit4;
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Roatp.ProviderModeration.Application.Providers.Queries.GetProvider;
@@ -32,7 +32,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Models
         [TestCase(ProviderStatusType.Onboarding, "", true, "Not submitted")]
         public void ImplicitOperatorForApiModel_ReturnsViewModelLinks(ProviderStatusType providerStatusType, string providerDescription, bool showAddLink, string providerDescriptionStatus)
         {
-            var queryResult  = new GetProviderQueryResult { Provider = new GetProviderResponse()};
+            var queryResult = new GetProviderQueryResult { Provider = new GetProviderResponse() };
             queryResult.Provider.ProviderStatusType = providerStatusType;
             queryResult.Provider.MarketingInfo = providerDescription;
 

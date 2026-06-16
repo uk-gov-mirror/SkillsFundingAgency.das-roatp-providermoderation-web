@@ -1,4 +1,5 @@
-﻿using AutoFixture.NUnit3;
+﻿using System.Net;
+using AutoFixture.NUnit4;
 using FluentAssertions;
 using MediatR;
 using Moq;
@@ -6,7 +7,6 @@ using NUnit.Framework;
 using SFA.DAS.Roatp.ProviderModeration.Application.Providers.Commands.UpdateProviderDescription;
 using SFA.DAS.Roatp.ProviderModeration.Domain.Interfaces;
 using SFA.DAS.Testing.AutoFixture;
-using System.Net;
 
 namespace SFA.DAS.Roatp.ProviderModeration.Application.UnitTests.Providers.Commands
 {

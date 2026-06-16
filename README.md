@@ -4,9 +4,8 @@
 
 <img src="https://avatars.githubusercontent.com/u/9841374?s=200&v=4" align="right" alt="UK Government logo">
 
-[![Build Status](https://dev.azure.com/sfa-gov-uk/Digital%20Apprenticeship%20Service/_apis/build/status/SkillsFundingAgency_das-roatp-providermoderation-web?branchName=main)](https://dev.azure.com/sfa-gov-uk/Digital%20Apprenticeship%20Service/_build/latest?definitionId=SkillsFundingAgency_das-roatp-providermoderation-web&branchName=min)
+[![Build Status](https://dev.azure.com/sfa-gov-uk/Digital%20Apprenticeship%20Service/_apis/build/status%2FApprenticeships%20Providers%2Fdas-roatp-providermoderation-web?repoName=SkillsFundingAgency%2Fdas-roatp-providermoderation-web&branchName=main)](https://dev.azure.com/sfa-gov-uk/Digital%20Apprenticeship%20Service/_build/latest?definitionId=2977&repoName=SkillsFundingAgency%2Fdas-roatp-providermoderation-web&branchName=main)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=SkillsFundingAgency_das-roatp-providermoderation-web&metric=alert_status)](https://sonarcloud.io/dashboard?id=SkillsFundingAgency_das-roatp-providermoderation-web)
-[![Confluence Page](https://img.shields.io/badge/Confluence-Project-blue)](https://skillsfundingagency.atlassian.net/wiki/spaces/NDL/pages/3852894209/AAN+Apprentice+Solution+Architecture)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey.svg?longCache=true&style=flat-square)](https://en.wikipedia.org/wiki/MIT_License)
 
 
@@ -19,13 +18,16 @@ It interacts with an outer api (https://github.com/SkillsFundingAgency/das-apim-
 
 ### Developer Setup
 
-#### Requirements
-- Clone this repository
-- Install [Visual Studio 2022](https://www.visualstudio.com/downloads/) with these workloads:
-    - ASP.NET and web development
-    - Azure development
-- Install [Azure Storage Emulator]
-- Install [Azure Storage Explorer](http://storageexplorer.com/)
+### Pre-Requisites
+
+* A clone of this repository
+* A storage emulator like Azurite
+* Visual studio or similar IDE 
+
+### Dependencies
+
+* DfE Signin for user authentication
+* The Outer API [das-apim-endpoints](https://github.com/SkillsFundingAgency/das-apim-endpoints/tree/master/src/RoatpProviderModeration) should be available either running locally or accessible in an Azure tenancy.
 
 #### Setup
 
@@ -59,7 +61,7 @@ You will also need to setup the roatp outer api and have it running (see https:/
 Open the solution with Visual Studio, and run the project SFA.DAS.Roatp.ProviderModeration.Web, running under process 'SFA.DAS.Roatp.ProviderModeration.Web' (not IIS)
 
 ## Technologies
-* .NetCore 8.0
+* .NetCore 10.0
 * NUnit
 * Moq
 * FluentAssertions

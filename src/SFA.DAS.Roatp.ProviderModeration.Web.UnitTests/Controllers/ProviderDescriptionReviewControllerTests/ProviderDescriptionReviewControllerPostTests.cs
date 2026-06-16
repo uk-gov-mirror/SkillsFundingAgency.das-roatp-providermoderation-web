@@ -1,5 +1,7 @@
 ﻿
 using FluentAssertions;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,8 +23,9 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderDes
         private Mock<IMediator> _mediatorMock;
         private ProviderDescriptionReviewController _sut;
         private Mock<IUrlHelper> _urlHelperMock;
-        string verifyUrl = "http://test";
-        string verifyEditUrl = "http://test-edit";
+        private Mock<IValidator<ProviderDescriptionReviewViewModel>> _validatorMock;
+        readonly string verifyUrl = "http://test";
+        readonly string verifyEditUrl = "http://test-edit";
         public const int Ukprn = 12345678;
         public const string LegalName = "TestLegalName";
         public const string ProviderDescription = "TestProviderDescription";
@@ -32,7 +35,12 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderDes
         {
             _mediatorMock = new Mock<IMediator>();
 
-            _sut = new ProviderDescriptionReviewController(_mediatorMock.Object, Mock.Of<ILogger<ProviderDescriptionReviewController>>());
+            _validatorMock = new Mock<IValidator<ProviderDescriptionReviewViewModel>>();
+
+            _validatorMock.Setup(x => x.ValidateAsync(It.IsAny<ProviderDescriptionReviewViewModel>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _sut = new ProviderDescriptionReviewController(_mediatorMock.Object, Mock.Of<ILogger<ProviderDescriptionReviewController>>(), _validatorMock.Object);
             _sut.AddDefaultContextWithUser();
             _urlHelperMock = new Mock<IUrlHelper>();
             _sut.Url = _urlHelperMock.Object;
@@ -86,7 +94,12 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderDes
             var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
             _sut.TempData = tempData;
 
-            _sut.ModelState.AddModelError("key", "message");
+            var failedValidationResult = new ValidationResult
+            {
+                Errors = [new ValidationFailure("key", "message")]
+            };
+            _validatorMock.Setup(x => x.ValidateAsync(It.IsAny<ProviderDescriptionReviewViewModel>()))
+                .ReturnsAsync(failedValidationResult);
 
             var result = await _sut.ReviewProviderDescription(submitModel);
 

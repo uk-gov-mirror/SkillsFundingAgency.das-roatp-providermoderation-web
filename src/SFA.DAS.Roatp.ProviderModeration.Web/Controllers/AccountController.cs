@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Mvc;
-using SFA.DAS.Roatp.ProviderModeration.Web.Configuration;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Roatp.ProviderModeration.Web.Configuration;
 using SFA.DAS.Roatp.ProviderModeration.Web.Models;
 
 namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
@@ -37,7 +37,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
         [HttpGet]
         public IActionResult PostSignIn()
         {
-           return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -78,16 +78,16 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
                 var userName = HttpContext.User.Identity.Name ?? HttpContext.User.FindFirstValue(ClaimTypes.Upn);
                 var roles = HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.Role || c.Type == Roles.RoleClaimType).Select(c => c.Value);
 
-                _logger.LogError("AccessDenied - User '{userName}' does not have a valid role. They have the following roles: {roles}", userName, string.Join(",", roles));
+                _logger.LogError("AccessDenied - User '{UserName}' does not have a valid role. They have the following roles: {Roles}", userName, string.Join(",", roles));
             }
-            
+
             var model = new Error403ViewModel
             {
                 UseDfESignIn = _applicationConfiguration.UseDfeSignIn,
                 HelpPageLink = _applicationConfiguration.DfESignInServiceHelpUrl
             };
 
-            return View("AccessDenied",model);
+            return View("AccessDenied", model);
         }
     }
 }

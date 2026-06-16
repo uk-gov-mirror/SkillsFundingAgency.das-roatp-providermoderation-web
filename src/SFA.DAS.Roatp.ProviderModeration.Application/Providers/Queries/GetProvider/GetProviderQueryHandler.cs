@@ -16,11 +16,11 @@ namespace SFA.DAS.Roatp.ProviderModeration.Application.Providers.Queries.GetProv
 
         public async Task<GetProviderQueryResult> Handle(GetProviderQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Get Provider request received for Ukprn number {ukprn}", request.Ukprn);
+            _logger.LogInformation("Get Provider request received for Ukprn number {Ukprn}", request.Ukprn);
             var provider = await _apiClient.Get<Domain.ApiModels.GetProviderResponse>($"providers/{request.Ukprn}");
             if (provider == null)
             {
-                _logger.LogError("Provider not found for {ukprn}", request.Ukprn);
+                _logger.LogError("Provider not found for {Ukprn}", request.Ukprn);
                 throw new InvalidOperationException($"Provider not found for UKPRN {request.Ukprn}");
             }
 

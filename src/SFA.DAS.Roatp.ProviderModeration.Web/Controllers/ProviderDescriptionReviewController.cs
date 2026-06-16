@@ -1,9 +1,11 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Roatp.ProviderModeration.Application.Providers.Commands.UpdateProviderDescription;
 using SFA.DAS.Roatp.ProviderModeration.Application.Providers.Queries.GetProvider;
 using SFA.DAS.Roatp.ProviderModeration.Web.Configuration;
+using SFA.DAS.Roatp.ProviderModeration.Web.Extensions;
 using SFA.DAS.Roatp.ProviderModeration.Web.Infrastructure;
 using SFA.DAS.Roatp.ProviderModeration.Web.Models;
 
@@ -14,11 +16,13 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<ProviderDescriptionReviewController> _logger;
+        private readonly IValidator<ProviderDescriptionReviewViewModel> _validator;
         public const string ViewPath = "~/Views/ProviderSearch/ProviderDescriptionReview.cshtml";
-        public ProviderDescriptionReviewController(IMediator mediator, ILogger<ProviderDescriptionReviewController> logger)
+        public ProviderDescriptionReviewController(IMediator mediator, ILogger<ProviderDescriptionReviewController> logger, IValidator<ProviderDescriptionReviewViewModel> validator)
         {
             _mediator = mediator;
             _logger = logger;
+            _validator = validator;
         }
 
         [HttpGet]
@@ -67,14 +71,21 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
         [Route("providers/{ukprn}/review-provider-description", Name = RouteNames.PostReviewProviderDescription)]
         public async Task<IActionResult> ReviewProviderDescription(ProviderDescriptionReviewViewModel submitModel)
         {
+            var validatedModel = await _validator.ValidateAsync(submitModel);
+
+            if (!validatedModel.IsValid)
+            {
+                ModelState.AddValidationErrors(validatedModel.Errors);
+            }
+
             if (!ModelState.IsValid)
             {
                 return RedirectToRoute(RouteNames.GetProviderDescription);
             }
 
-            _logger.LogInformation("Provider description updating for {ukprn}", submitModel.Ukprn);
+            _logger.LogInformation("Provider description updating for {Ukprn}", submitModel.Ukprn);
             TempData.Remove("ProviderDescription");
-            
+
             var command = new UpdateProviderDescriptionCommand
             {
                 Ukprn = submitModel.Ukprn,

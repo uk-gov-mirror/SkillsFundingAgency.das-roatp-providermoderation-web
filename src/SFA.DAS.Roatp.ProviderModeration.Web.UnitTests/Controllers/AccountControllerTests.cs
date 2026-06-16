@@ -35,24 +35,24 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers
         public void SignIn_returns_expected_ChallengeResult()
         {
             _configurationMock.Setup(x => x.Value.UseDfeSignIn).Returns(false);
-            
+
             var result = _controller.SignIn() as ChallengeResult;
 
             Assert.That(result, Is.Not.Null);
-            CollectionAssert.IsNotEmpty(result?.AuthenticationSchemes);
-            CollectionAssert.Contains(result?.AuthenticationSchemes, WsFederationDefaults.AuthenticationScheme);
+            Assert.That(result.AuthenticationSchemes, Is.Not.Empty);
+            Assert.That(result.AuthenticationSchemes.Contains(WsFederationDefaults.AuthenticationScheme));
         }
-        
+
         [Test]
         public void SignIn_returns_expected_ChallengeResult_DfeSignIn()
         {
             _configurationMock.Setup(x => x.Value.UseDfeSignIn).Returns(true);
-            
+
             var result = _controller.SignIn() as ChallengeResult;
 
             Assert.That(result, Is.Not.Null);
-            CollectionAssert.IsNotEmpty(result?.AuthenticationSchemes);
-            CollectionAssert.Contains(result?.AuthenticationSchemes, OpenIdConnectDefaults.AuthenticationScheme);
+            Assert.That(result.AuthenticationSchemes, Is.Not.Empty);
+            Assert.That(result.AuthenticationSchemes.Contains(OpenIdConnectDefaults.AuthenticationScheme));
         }
 
         [Test]
@@ -68,26 +68,26 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers
         public void SignOut_returns_expected_SignOutResult()
         {
             _configurationMock.Setup(x => x.Value.UseDfeSignIn).Returns(false);
-            
+
             var result = _controller.SignOut() as SignOutResult;
 
             Assert.That(result, Is.Not.Null);
-            CollectionAssert.IsNotEmpty(result?.AuthenticationSchemes);
-            CollectionAssert.Contains(result?.AuthenticationSchemes, WsFederationDefaults.AuthenticationScheme);
-            CollectionAssert.Contains(result?.AuthenticationSchemes, CookieAuthenticationDefaults.AuthenticationScheme);
+            Assert.That(result.AuthenticationSchemes, Is.Not.Empty);
+            Assert.That(result.AuthenticationSchemes.Contains(WsFederationDefaults.AuthenticationScheme));
+            Assert.That(result.AuthenticationSchemes.Contains(CookieAuthenticationDefaults.AuthenticationScheme));
         }
 
         [Test]
         public void SignOut_returns_expected_SignOutResult_DfeSignIn()
         {
             _configurationMock.Setup(x => x.Value.UseDfeSignIn).Returns(true);
-            
+
             var result = _controller.SignOut() as SignOutResult;
 
             Assert.That(result, Is.Not.Null);
-            CollectionAssert.IsNotEmpty(result?.AuthenticationSchemes);
-            CollectionAssert.Contains(result?.AuthenticationSchemes, OpenIdConnectDefaults.AuthenticationScheme);
-            CollectionAssert.Contains(result?.AuthenticationSchemes, CookieAuthenticationDefaults.AuthenticationScheme);
+            Assert.That(result.AuthenticationSchemes, Is.Not.Empty);
+            Assert.That(result.AuthenticationSchemes.Contains(OpenIdConnectDefaults.AuthenticationScheme));
+            Assert.That(result.AuthenticationSchemes.Contains(CookieAuthenticationDefaults.AuthenticationScheme));
         }
 
         [Test]

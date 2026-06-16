@@ -1,5 +1,6 @@
-﻿using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit4;
 using FluentAssertions;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -39,7 +40,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderDes
                .Setup(m => m.RouteUrl(It.Is<UrlRouteContext>(c => c.RouteName.Equals(RouteNames.GetReviewProviderDescriptionEdit))))
                .Returns(verifyEditUrl);
 
-            _sut = new ProviderDescriptionReviewController(_mediatorMock.Object, Mock.Of<ILogger<ProviderDescriptionReviewController>>());
+            _sut = new ProviderDescriptionReviewController(_mediatorMock.Object, Mock.Of<ILogger<ProviderDescriptionReviewController>>(), Mock.Of<IValidator<ProviderDescriptionReviewViewModel>>());
             _sut.Url = _urlHelperMock.Object;
 
             var tempDataMock = new Mock<ITempDataDictionary>();
@@ -95,7 +96,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderDes
         {
             _mediatorMock
                 .Setup(m => m.Send(It.Is<GetProviderQuery>(q => q.Ukprn == ukprn), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetProviderQueryResult {  Provider = new GetProviderResponse { MarketingInfo = "", ProviderType = ProviderType.Main, ProviderStatusType = ProviderStatusType.Onboarding} });
+                .ReturnsAsync(new GetProviderQueryResult { Provider = new GetProviderResponse { MarketingInfo = "", ProviderType = ProviderType.Main, ProviderStatusType = ProviderStatusType.Onboarding } });
 
             var result = await _sut.EditEntry(ukprn);
 

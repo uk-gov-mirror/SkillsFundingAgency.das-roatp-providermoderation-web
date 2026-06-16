@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,10 +24,11 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderSea
         private Mock<ILogger<ProviderSearchController>> _logger;
         private Mock<IMediator> _mediator;
         private Mock<IUrlHelper> _urlHelperMock;
+        private Mock<IValidator<ProviderSearchSubmitModel>> _validatorMock;
 
         public const string Ukprn = "12345678";
         public const string MarketingInfo = "Marketing info";
-        string verifyAddProviderDescriptionUrl = "http://test-AddProviderDescriptionUrl";
+        readonly string verifyAddProviderDescriptionUrl = "http://test-AddProviderDescriptionUrl";
 
         [SetUp]
         public void Before_each_test()
@@ -41,7 +44,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderSea
             _mediator.Setup(x => x.Send(It.IsAny<GetProviderQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => new GetProviderQueryResult
                 {
-                   Provider = provider
+                    Provider = provider
                 });
 
             _urlHelperMock = new Mock<IUrlHelper>();
@@ -50,7 +53,12 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderSea
                .Setup(m => m.RouteUrl(It.Is<UrlRouteContext>(c => c.RouteName.Equals(RouteNames.GetAddProviderDescription))))
                .Returns(verifyAddProviderDescriptionUrl);
 
-            _sut = new ProviderSearchController(_mediator.Object, _logger.Object);
+            _validatorMock = new Mock<IValidator<ProviderSearchSubmitModel>>();
+
+            _validatorMock.Setup(x => x.ValidateAsync(It.IsAny<ProviderSearchSubmitModel>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _sut = new ProviderSearchController(_mediator.Object, _logger.Object, _validatorMock.Object);
             _sut.Url = _urlHelperMock.Object;
 
             var httpContext = new DefaultHttpContext();
@@ -85,7 +93,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderSea
 
             var result = await _sut.GetProviderDescription(submitModel);
 
-            if(isValidToDisplayProviderResponse)
+            if (isValidToDisplayProviderResponse)
             {
                 var redirectResult = result as RedirectToRouteResult;
                 redirectResult.Should().NotBeNull();
@@ -103,7 +111,13 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderSea
         [Test]
         public async Task ProviderController_GetProviderDescription_ModelStateErrorReturnSameView()
         {
-            _sut.ModelState.AddModelError("ProviderNotMainProvider", "ErrorMessage");
+            var failedValidationResult = new ValidationResult
+            {
+                Errors = [new ValidationFailure("ProviderNotMainProvider", "ErrorMessage")]
+            };
+
+            _validatorMock.Setup(x => x.ValidateAsync(It.IsAny<ProviderSearchSubmitModel>()))
+                .ReturnsAsync(failedValidationResult);
 
             var model = new ProviderSearchSubmitModel
             {
@@ -125,7 +139,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.UnitTests.Controllers.ProviderSea
             _mediator.Setup(x => x.Send(It.IsAny<GetProviderQuery>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException());
 
-            _sut = new ProviderSearchController(_mediator.Object, _logger.Object);
+            _sut = new ProviderSearchController(_mediator.Object, _logger.Object, _validatorMock.Object);
 
             var model = new ProviderSearchSubmitModel
             {

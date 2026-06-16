@@ -1,9 +1,11 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Roatp.ProviderModeration.Application.Providers.Queries.GetProvider;
 using SFA.DAS.Roatp.ProviderModeration.Domain.ApiModels;
 using SFA.DAS.Roatp.ProviderModeration.Web.Configuration;
+using SFA.DAS.Roatp.ProviderModeration.Web.Extensions;
 using SFA.DAS.Roatp.ProviderModeration.Web.Infrastructure;
 using SFA.DAS.Roatp.ProviderModeration.Web.Models;
 
@@ -14,11 +16,13 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<ProviderSearchController> _logger;
+        private readonly IValidator<ProviderSearchSubmitModel> _validator;
         public const string ProviderNotAvailable = "This UKPRN could not be found. This is because the UKPRN does not exist or is inactive on the UK Register of Learning Providers.";
-        public ProviderSearchController(IMediator mediator, ILogger<ProviderSearchController> logger)
+        public ProviderSearchController(IMediator mediator, ILogger<ProviderSearchController> logger, IValidator<ProviderSearchSubmitModel> validator)
         {
             _mediator = mediator;
             _logger = logger;
+            _validator = validator;
         }
 
         [HttpGet]
@@ -32,7 +36,14 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
         [Route("providers/provider-description", Name = RouteNames.PostProviderDescription)]
         public async Task<IActionResult> GetProviderDescription(ProviderSearchSubmitModel submitModel)
         {
-            _logger.LogInformation("Provider description gathering for {ukprn}", submitModel.Ukprn);
+            _logger.LogInformation("Provider description gathering for {Ukprn}", submitModel.Ukprn);
+
+            var validatedModel = await _validator.ValidateAsync(submitModel);
+
+            if (!validatedModel.IsValid)
+            {
+                ModelState.AddValidationErrors(validatedModel.Errors);
+            }
 
             if (!ModelState.IsValid)
             {

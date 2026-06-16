@@ -15,11 +15,11 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Validators
                 .Must(BeAValidInt).WithMessage(InvalidUkprnErrorMessage)
                 .Must(BeAValidUkprn).WithMessage(InvalidUkprnErrorMessage);
         }
-        private bool BeAValidInt(string ukprnInput)
+        private static bool BeAValidInt(string ukprnInput)
         {
             return int.TryParse(ukprnInput.ToString(), out _);
         }
-        private bool BeAValidUkprn(string ukprnInput)
+        private static bool BeAValidUkprn(string ukprnInput)
         {
             return int.Parse(ukprnInput.ToString()) > 10000000 && int.Parse(ukprnInput.ToString()) < 99999999;
         }

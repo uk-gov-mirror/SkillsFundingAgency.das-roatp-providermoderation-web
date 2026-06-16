@@ -18,13 +18,13 @@ namespace SFA.DAS.Roatp.ProviderModeration.Application.Providers.Commands.Update
 
         public async Task<Unit> Handle(UpdateProviderDescriptionCommand command, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Command triggered to update provider description  for ukprn:{ukprn} from user:{userid}", command.Ukprn, command.UserId);
+            _logger.LogInformation("Command triggered to update provider description for ukprn:{Ukprn} from user:{Userid}", command.Ukprn, command.UserId);
 
             var statusCode = await _apiClient.Post($"providers/{command.Ukprn}/update-provider-description", command);
 
             if (statusCode != System.Net.HttpStatusCode.NoContent)
             {
-                _logger.LogError("Failed to update provider description for ukprn:{ukprn} from user:{userid}", command.Ukprn, command.UserId);
+                _logger.LogError("Failed to update provider description for ukprn:{Ukprn} from user:{Userid}", command.Ukprn, command.UserId);
                 throw new InvalidOperationException("Update provider description response did not come back with success code");
             }
 

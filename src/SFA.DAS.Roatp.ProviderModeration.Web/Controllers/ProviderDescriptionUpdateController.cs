@@ -1,8 +1,10 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Roatp.ProviderModeration.Application.Providers.Queries.GetProvider;
 using SFA.DAS.Roatp.ProviderModeration.Web.Configuration;
+using SFA.DAS.Roatp.ProviderModeration.Web.Extensions;
 using SFA.DAS.Roatp.ProviderModeration.Web.Infrastructure;
 using SFA.DAS.Roatp.ProviderModeration.Web.Models;
 
@@ -13,11 +15,13 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<ProviderDescriptionUpdateController> _logger;
+        private readonly IValidator<ProviderDescriptionSubmitModel> _validator;
         public const string ViewPath = "~/Views/ProviderSearch/ProviderDescriptionUpdate.cshtml";
-        public ProviderDescriptionUpdateController(IMediator mediator, ILogger<ProviderDescriptionUpdateController> logger)
+        public ProviderDescriptionUpdateController(IMediator mediator, ILogger<ProviderDescriptionUpdateController> logger, IValidator<ProviderDescriptionSubmitModel> validator)
         {
             _mediator = mediator;
             _logger = logger;
+            _validator = validator;
         }
 
         [HttpGet]
@@ -40,7 +44,14 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
         [Route("providers/{ukprn}/update-provider-description", Name = RouteNames.PostUpdateProviderDescription)]
         public IActionResult UpdateProviderDescription(ProviderDescriptionSubmitModel submitModel)
         {
-            _logger.LogInformation("Provider description updating for {ukprn}", submitModel.Ukprn);
+            _logger.LogInformation("Provider description updating for {Ukprn}", submitModel.Ukprn);
+
+            var validatedModel = _validator.Validate(submitModel);
+
+            if (!validatedModel.IsValid)
+            {
+                ModelState.AddValidationErrors(validatedModel.Errors);
+            }
 
             if (!ModelState.IsValid)
             {
@@ -54,9 +65,9 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
                 };
                 return View(ViewPath, model);
             }
-            
+
             TempData["ProviderDescription"] = submitModel.ProviderDescription;
-            return RedirectToRoute(RouteNames.GetReviewProviderDescription, new { submitModel.Ukprn});
+            return RedirectToRoute(RouteNames.GetReviewProviderDescription, new { submitModel.Ukprn });
         }
     }
 }
