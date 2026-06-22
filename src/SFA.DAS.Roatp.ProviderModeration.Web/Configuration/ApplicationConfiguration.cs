@@ -6,7 +6,6 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Configuration;
 public class ApplicationConfiguration
 {
     public string EsfaAdminServicesBaseUrl { get; set; }
-    public virtual bool UseDfeSignIn { get; set; }
     public virtual string DfESignInServiceHelpUrl { get; set; }
     public string SessionRedisConnectionString { get; set; }
     public string DataProtectionKeysDatabase { get; set; }

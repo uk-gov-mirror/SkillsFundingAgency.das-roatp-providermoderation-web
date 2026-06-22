@@ -25,13 +25,10 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
         public IActionResult SignIn()
         {
             _logger.LogInformation("Start of Sign In");
-            var challengeScheme = _applicationConfiguration.UseDfeSignIn
-                ? OpenIdConnectDefaults.AuthenticationScheme
-                : WsFederationDefaults.AuthenticationScheme;
             var redirectUrl = Url.Action("PostSignIn", "Account");
             return Challenge(
                 new AuthenticationProperties { RedirectUri = redirectUrl },
-                challengeScheme);
+                OpenIdConnectDefaults.AuthenticationScheme);
         }
 
         [HttpGet]
@@ -50,10 +47,6 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
                 Response.Cookies.Delete(cookie);
             }
 
-            var authScheme = _applicationConfiguration.UseDfeSignIn
-                ? OpenIdConnectDefaults.AuthenticationScheme
-                : WsFederationDefaults.AuthenticationScheme;
-
             return SignOut(
                 new AuthenticationProperties
                 {
@@ -61,7 +54,7 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
                     AllowRefresh = true
                 },
                 CookieAuthenticationDefaults.AuthenticationScheme,
-                authScheme);
+                OpenIdConnectDefaults.AuthenticationScheme);
         }
 
         [HttpGet]
@@ -83,7 +76,6 @@ namespace SFA.DAS.Roatp.ProviderModeration.Web.Controllers
 
             var model = new Error403ViewModel
             {
-                UseDfESignIn = _applicationConfiguration.UseDfeSignIn,
                 HelpPageLink = _applicationConfiguration.DfESignInServiceHelpUrl
             };
 
